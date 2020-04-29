@@ -1,15 +1,12 @@
-using System;
-using System.Linq;
-using System.Threading.Tasks;
-using ESoftPlus.Api.Framework;
 using ESoftPlus.Common.Authentication;
 using ESoftPlus.Common.Messages;
 using ESoftPlus.Common.RabbitMq;
 using ESoftPlus.Common.Types;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using OpenTracing;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace ESoftPlus.Api.Controllers
 {
@@ -32,7 +29,7 @@ namespace ESoftPlus.Api.Controllers
             _tracer = tracer;
         }
 
-        protected IActionResult Single<T>(T model, Func<T,bool> criteria = null)
+        protected IActionResult Single<T>(T model, Func<T, bool> criteria = null)
         {
             if (model == null)
             {
@@ -47,7 +44,7 @@ namespace ESoftPlus.Api.Controllers
             return NotFound();
         }
 
-        protected IActionResult Collection<T>(PagedResult<T> pagedResult, Func<PagedResult<T>,bool> criteria = null)
+        protected IActionResult Collection<T>(PagedResult<T> pagedResult, Func<PagedResult<T>, bool> criteria = null)
         {
             if (pagedResult == null)
             {
@@ -68,8 +65,8 @@ namespace ESoftPlus.Api.Controllers
             return Ok(pagedResult.Items);
         }
 
-        protected async Task<IActionResult> SendAsync<T>(T command, 
-            Guid? resourceId = null, string resource = "") where T : ICommand 
+        protected async Task<IActionResult> SendAsync<T>(T command,
+            Guid? resourceId = null, string resource = "") where T : ICommand
         {
             var context = GetContext<T>(resourceId, resource);
             await _busPublisher.SendAsync(command, context);
@@ -95,7 +92,7 @@ namespace ESoftPlus.Api.Controllers
                 resource = $"{resource}/{resourceId}";
             }
 
-            return CorrelationContext.Create<T>(Guid.NewGuid(), UserId, resourceId ?? Guid.Empty, 
+            return CorrelationContext.Create<T>(Guid.NewGuid(), UserId, resourceId ?? Guid.Empty,
                HttpContext.TraceIdentifier, HttpContext.Connection.Id, _tracer.ActiveSpan.Context.ToString(),
                Request.Path.ToString(), Culture, resource);
         }
@@ -104,12 +101,12 @@ namespace ESoftPlus.Api.Controllers
             => User.IsInRole("admin");
 
         protected Guid UserId
-            => string.IsNullOrWhiteSpace(User?.Identity?.Name) ? 
-                Guid.Empty : 
+            => string.IsNullOrWhiteSpace(User?.Identity?.Name) ?
+                Guid.Empty :
                 Guid.Parse(User.Identity.Name);
 
-        protected string Culture 
-            => Request.Headers.ContainsKey(AcceptLanguageHeader) ? 
+        protected string Culture
+            => Request.Headers.ContainsKey(AcceptLanguageHeader) ?
                     Request.Headers[AcceptLanguageHeader].First().ToLowerInvariant() :
                     DefaultCulture;
 
@@ -135,7 +132,7 @@ namespace ESoftPlus.Api.Controllers
         private string GetPageLink(int currentPage, int page)
         {
             var path = Request.Path.HasValue ? Request.Path.ToString() : string.Empty;
-            var queryString = Request.QueryString.HasValue ?  Request.QueryString.ToString() : string.Empty;
+            var queryString = Request.QueryString.HasValue ? Request.QueryString.ToString() : string.Empty;
             var conjunction = string.IsNullOrWhiteSpace(queryString) ? "?" : "&";
             var fullPath = $"{path}{queryString}";
             var pageArg = $"{PageLink}={page}";

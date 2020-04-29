@@ -1,10 +1,9 @@
-using Microsoft.AspNetCore;
-using Microsoft.AspNetCore.Hosting;
 using ESoftPlus.Common.Logging;
 using ESoftPlus.Common.Metrics;
 using ESoftPlus.Common.Mvc;
 using ESoftPlus.Common.Vault;
-using System;
+using Microsoft.AspNetCore;
+using Microsoft.AspNetCore.Hosting;
 
 namespace ESoftPlus.Api
 {

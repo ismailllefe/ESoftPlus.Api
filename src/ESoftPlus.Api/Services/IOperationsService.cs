@@ -1,7 +1,7 @@
+using ESoftPlus.Api.Models.Operations;
+using RestEase;
 using System;
 using System.Threading.Tasks;
-using RestEase;
-using ESoftPlus.Api.Models.Operations;
 
 namespace ESoftPlus.Api.Services
 {
@@ -9,6 +9,6 @@ namespace ESoftPlus.Api.Services
     {
         [AllowAnyStatusCode]
         [Get("operations/{id}")]
-        Task<Operation> GetAsync([Path] Guid id);          
+        Task<Operation> GetAsync([Path] Guid id);
     }
 }

@@ -2,9 +2,9 @@
 using ESoftPlus.Common.RabbitMq;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using OpenTracing;
 using System;
 using System.Threading.Tasks;
-using OpenTracing;
 
 namespace ESoftPlus.Api.Controllers
 {
@@ -13,7 +13,7 @@ namespace ESoftPlus.Api.Controllers
     {
         private readonly IOperationsService _operationsService;
 
-        public OperationsController(IBusPublisher busPublisher,  ITracer tracer,
+        public OperationsController(IBusPublisher busPublisher, ITracer tracer,
             IOperationsService operationsService) : base(busPublisher, tracer)
         {
             _operationsService = operationsService;

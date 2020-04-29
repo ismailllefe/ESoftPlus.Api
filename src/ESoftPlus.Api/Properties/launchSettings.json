@@ -15,9 +15,9 @@
         "ASPNETCORE_ENVIRONMENT": "local"
       }
     },
-    "ESoftPlus.Api": {
+    "ESoftPlusApi": {
       "commandName": "Project",
-      "launchBrowser": false,
+      "launchBrowser": true,
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "local"
       },

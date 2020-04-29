@@ -1,7 +1,4 @@
-﻿
-using System;
-using System.Reflection;
-using Autofac;
+﻿using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using Consul;
 using ESoftPlus.Api.Services;
@@ -17,15 +14,16 @@ using ESoftPlus.Common.RestEase;
 using ESoftPlus.Common.Swagger;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using System;
+using System.Reflection;
 
 namespace ESoftPlus.Api
 {
     public class Startup
     {
-        private static readonly string[] Headers = new []{ "X-Operation", "X-Resource", "X-Total-Count" };
+        private static readonly string[] Headers = new[] { "X-Operation", "X-Resource", "X-Total-Count" };
         public IContainer Container { get; private set; }
         public IConfiguration Configuration { get; }
 
@@ -46,7 +44,7 @@ namespace ESoftPlus.Api
             services.AddAuthorization(x => x.AddPolicy("admin", p => p.RequireRole("admin")));
             services.AddCors(options =>
             {
-                options.AddPolicy("CorsPolicy", cors => 
+                options.AddPolicy("CorsPolicy", cors =>
                         cors.AllowAnyOrigin()
                             .AllowAnyMethod()
                             .AllowAnyHeader()
@@ -54,21 +52,28 @@ namespace ESoftPlus.Api
                             .WithExposedHeaders(Headers));
             });
             services.RegisterServiceForwarder<IOperationsService>("operations-service");
-            
+            services.RegisterServiceForwarder<ICountriesService>("countries-service");
+            services.RegisterServiceForwarder<ICitiesService>("cities-service");
+            services.RegisterServiceForwarder<ICompaniesService>("companies-service");
+            services.RegisterServiceForwarder<IFieldsService>("fields-service");
+            services.RegisterServiceForwarder<IDevicesService>("devices-service");
+            services.RegisterServiceForwarder<IIndustrialProtocolsService>("industrialprotocols-service");
+            services.RegisterServiceForwarder<ITagsService>("tags-service");
+
             var builder = new ContainerBuilder();
             builder.RegisterAssemblyTypes(Assembly.GetEntryAssembly())
                     .AsImplementedInterfaces();
             builder.Populate(services);
             builder.AddRabbitMq();
             builder.AddDispatchers();
-                    
+
             Container = builder.Build();
 
             return new AutofacServiceProvider(Container);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, 
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env,
             IApplicationLifetime applicationLifetime, IConsulClient client,
             IStartupInitializer startupInitializer)
         {
@@ -86,12 +91,12 @@ namespace ESoftPlus.Api
             app.UseServiceId();
             app.UseMvc();
             app.UseRabbitMq();
-            
+
             var consulServiceId = app.UseConsul();
-            applicationLifetime.ApplicationStopped.Register(() => 
-            { 
-                client.Agent.ServiceDeregister(consulServiceId); 
-                Container.Dispose(); 
+            applicationLifetime.ApplicationStopped.Register(() =>
+            {
+                client.Agent.ServiceDeregister(consulServiceId);
+                Container.Dispose();
             });
 
             startupInitializer.InitializeAsync();
